@@ -1,7 +1,19 @@
+# Dependencias (Ignora node_modules en cualquier subcarpeta)
+**/node_modules/
+
+# Configuración y secretos
+.env
+.env.local
+
+# Archivos del sistema y logs
 .DS_Store
 Thumbs.db
-node_modules/
-.vscode/
 *.log
-.env
+npm-debug.log*
+
+# Editor (VS Code)
+.vscode/
+
+# Build/Producción
 dist/
+build/
