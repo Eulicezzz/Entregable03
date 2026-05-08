@@ -4,13 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú Principal</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
 
     <div class="menu-card">
         <h1 id="welcomeMsg">Cargando...</h1>
-        <button onclick="logout()">Cerrar Sesión</button>
+        <div class="options-grid">
+        <div class="option-item" onclick="location.href='/ventas'">
+            <h3>🛒 Ventas</h3>
+            <p>Registrar salida de productos</p>
+        </div>
+        <div class="option-item" onclick="location.href='/productos'">
+            <h3>📦 Inventario</h3>
+            <p>Ver y editar stock</p>
+        </div>
+        <div class="option-item" onclick="location.href='/alertas'">
+            <h3>⚠️ Alertas</h3>
+            <p>Productos por agotarse</p>
+        </div>
+    </div>
+        <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
     </div>
 
     <script>
