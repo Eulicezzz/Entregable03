@@ -5,8 +5,9 @@ const authRoutes = require('./routes/authRoutes'); // La nueva ruta limpia
 require('dotenv').config();
 
 const app = express();
+const productRoutes = require('./routes/productRoutes'); // Ruta para obtener productos
 
-// 1. Configuración de CORS (Permite que React se comunique)
+// Configuración de CORS (Permite que React se comunique)
 app.use(cors({
     origin: "http://localhost:3000", // El puerto de tu React
     credentials: true
@@ -15,7 +16,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 2. Configuración de Sesiones
+// Configuración de Sesiones
 app.use(session({
     secret: process.env.SESSION_SECRET || 'secreto_botica', 
     resave: false,
@@ -26,10 +27,11 @@ app.use(session({
     }
 }));
 
-// 3. Rutas de la API
+// Rutas de la API
 app.use('/api/auth', authRoutes);
+app.use('/api/productos', productRoutes);
 
-// 4. Puerto (Cambiado al 4000)
+// Puerto (Cambiado al 4000)
 const PORT = 4000;
 app.listen(PORT, () => {
     console.log(`Backend de la Botica en: http://localhost:${PORT}`);
