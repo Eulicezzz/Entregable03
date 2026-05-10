@@ -80,10 +80,7 @@ const Menu = () => {
                 )}
             </div>
 
-            <button className="btn-logout" onClick={() => {
-                localStorage.clear();
-                window.location.href = 'http://localhost:4000/api/auth/logout'; 
-            }}>
+            <button className="btn-logout" onClick={handleLogout}>
                 Cerrar Sesión
             </button>
         </div>
