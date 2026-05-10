@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const app = express();
 const productRoutes = require('./routes/productRoutes'); // Ruta para obtener productos
+const loteRoutes = require('./routes/loteRoutes'); // Ruta para manejar lotes
 
 // Configuración de CORS (Permite que React se comunique)
 app.use(cors({
@@ -30,6 +31,7 @@ app.use(session({
 // Rutas de la API
 app.use('/api/auth', authRoutes);
 app.use('/api/productos', productRoutes);
+app.use('/api/lotes', loteRoutes);
 
 // Puerto (Cambiado al 4000)
 const PORT = 4000;

@@ -355,3 +355,19 @@ button:hover {
     border: 1px solid #ccc;
     border-radius: 6px;
 }
+
+.btn-lote {
+    background: #2ecc71;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: 0.3s;
+}
+
+.btn-lote:hover {
+    background: #27ae60;
+    transform: scale(1.1);
+}

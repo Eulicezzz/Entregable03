@@ -2,7 +2,16 @@ const db = require("../config/db");
 
 const getProductos = async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM producto");
+    const query = `
+      SELECT
+        p.*,
+        IFNULL(SUM(l.stock_lote), 0) AS stock_actual
+      FROM producto p
+      LEFT JOIN lote l ON p.id_producto = l.id_producto
+      GROUP BY p.id_producto
+    `;
+
+    const [rows] = await db.query(query);
     res.json(rows);
   } catch (error) {
     console.error("Error al obtener productos: ", error);
