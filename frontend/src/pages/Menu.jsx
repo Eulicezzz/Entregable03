@@ -66,9 +66,9 @@ const Menu = () => {
                     <p>Registrar salida</p>
                 </div>
 
-                <div className="option-item" onClick={() => navigate('/inventario')}>
+                <div className="option-item" onClick={() => navigate('/productos')}>
                     <h3>📦 Inventario</h3>
-                    <p>Ver stock</p>
+                    <p className="menu-link">Ver stock</p>
                 </div>
 
                 {/* Comprobación de rol (asegúrate que en la DB sea 'Administrador') */}

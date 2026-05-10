@@ -5,24 +5,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0; 
-}
-
-/*Contenedor del login*/
-.login-container {
-    background-color: white;
-    padding: 2.5rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
 }
 
 h2 {
     color: #005f73;
-    margin-bottopm: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 /*Estilos de los imputs*/
@@ -67,6 +56,135 @@ button:hover {
     font-size: 0.9rem;
     font-weight: 500;
 }
+
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f4f7f6; 
+    margin: 0;
+}
+
+.login-card-wrapper {
+    display: flex;
+    width: 90%; 
+    max-width: 1100px; /* Ancho extendido */
+    height: 600px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+/* --- PANEL IZQUIERDO (COLOR/VISUAL) --- */
+
+.login-visual {
+    flex: 1.2; /* Es un poco más ancho que el formulario */
+    background: linear-gradient(135deg, #005f73 0%, #0a9396 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 40px;
+    text-align: center;
+}
+
+.visual-content h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.visual-content p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.visual-icon {
+    font-size: 6rem;
+    margin-top: 30px;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+}
+
+/* --- PANEL DERECHO (FORMULARIO) --- */
+
+.login-form-side {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    padding: 60px;
+}
+
+.form-content {
+    width: 100%;
+    max-width: 350px; /* El formulario se mantiene centrado y legible */
+}
+
+.form-content h2 {
+    font-size: 2.2rem;
+    color: #005f73;
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.form-content input {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 2px solid #edeff2;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+}
+
+.form-content input:focus {
+    outline: none;
+    border-color: #0a9396;
+    background-color: #f7ffff;
+    box-shadow: 0 0 0 4px rgba(10, 147, 150, 0.1);
+}
+
+.form-content button {
+    width: 100%;
+    background-color: #005f73;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.form-content button:hover {
+    background-color: #0a9396;
+}
+
+.mensaje-login {
+    margin-top: 20px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Responsivo para tablets y celulares */
+@media (max-width: 900px) {
+    .login-card-wrapper {
+        flex-direction: column;
+        height: auto;
+        max-width: 450px;
+    }
+    .login-visual {
+        padding: 30px;
+    }
+    .login-visual h1 { font-size: 2rem; }
+    .visual-icon { display: none; }
+}
+
+
 
 /* --- ESTILOS PARA EL CRUD DE ADMINISTRACIÓN --- */
 
@@ -161,3 +279,79 @@ button:hover {
 
 .btn-edit:hover { background-color: #ca6702; }
 .btn-delete:hover { background-color: #9b2226; }
+
+
+/*Herramientas de búsqueda*/
+.admin-tools {
+    margin-bottom: 20px;
+}
+
+.search-input {
+    max-width: 400px;
+    border: 2px solid #ddd !important;
+}
+
+/*Badges de estado*/
+.badge-danger {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.badge-success {
+    background-color: #2ecc71;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+/*Botón de añadir principal*/
+.btn-add {
+    background-color: #0a9396;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 8px;
+    width: auto;
+    font-size: 1rem;
+}
+
+.form-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 15px; /* Más espacio interno */
+    margin: 10px 0 20px 0; /* Margen externo para separarlo de otros inputs */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box; /* Crucial para que el padding no desborde el ancho */
+    font-family: inherit;
+}
+
+.form-row {
+    display: flex;
+    gap: 25px; /* Espacio generoso entre columnas */
+    margin-top: 10px;
+    width: 100%;
+}
+
+.form-group {
+    flex: 1; /* Ambos ocupan el mismo ancho */
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    color: #444;
+}
+
+.form-group input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}

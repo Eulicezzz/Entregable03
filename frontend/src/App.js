@@ -3,7 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Menu from './pages/Menu';
 import AdminUsuarios from './pages/AdminUsuarios';
+import GestionProductos from './pages/GestionProductos';
+
 import './assets/css/styles.css'; // Importamos tus estilos globales
+
 
 function App() {
   return (
@@ -12,6 +15,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/admin-usuarios" element={<AdminUsuarios />} />
+        <Route path="/productos" element={<GestionProductos />} />
       </Routes>
     </Router>
   );
