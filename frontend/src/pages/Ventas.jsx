@@ -91,6 +91,70 @@ const Ventas = () => {
     setCarrito(carrito.filter((item) => item.id_lote !== id_lote));
   };
 
+  const manejarGuardarCliente = async () => {
+    // Validar que al menos tenga nombre y DNI
+    if (!nuevoCliente.nombre || !nuevoCliente.dni) {
+      alert("Por favor, ingresa el nombre y DNI del cliente.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:4000/api/clientes/registrar",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nuevoCliente),
+        },
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        // 1. Actualizamos el cliente seleccionado para la venta
+        setCliente({
+          id_cliente: data.id_cliente,
+          nombre: data.nombre,
+          dni: data.dni,
+          correo: data.email
+        });
+
+        // 2. Cerramos el formulario y limpiamos los campos
+        setMostrarFormCliente(false);
+        setNuevoCliente({ nombre: "", dni: "", telefono: "", email: "" });
+
+        alert("Cliente registrado y seleccionado con éxito.");
+      } else {
+        alert("Error: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error al conectar con el servidor:", error);
+      alert("No se pudo conectar con el servidor.");
+    }
+  };
+
+  const buscarCliente = async (dniBusqueda) => {
+    if (dniBusqueda.length >= 8) { // DNI peruano tiene 8 dígitos
+        try {
+            const res = await fetch(`http://localhost:4000/api/clientes/buscar/${dniBusqueda}`);
+            const data = await res.json();
+            
+            if (data.success) {
+                // Si existe, lo seleccionamos automáticamente
+                setCliente(data.cliente);
+                setMostrarFormCliente(false);
+                alert(`Cliente encontrado: ${data.cliente.nombre}`);
+            } else {
+                // Si no existe, podrías limpiar el nombre para que lo registren
+                setNuevoCliente({ ...nuevoCliente, dni: dniBusqueda, nombre: '', telefono: '' });
+                console.log("Cliente no existe, proceda a registrar.");
+            }
+        } catch (error) {
+            console.error("Error al buscar cliente:", error);
+        }
+    }
+};
+
   return (
     <div className="admin-page-wrapper">
       <header
@@ -220,17 +284,22 @@ const Ventas = () => {
             {cliente.dni && `(DNI: ${cliente.dni})`}
           </p>
           <button
-            onClick={() => setMostrarFormCliente(!mostrarFormCliente)}
-            style={{
-              fontSize: "0.8rem",
-              backgroundColor: "#006666",
-              border: "1px solid #ccc",
-              cursor: "pointer",
-              padding: "5px",
-            }}
-          >
-            {mostrarFormCliente ? "Cerrar" : "Cambiar / Registrar Cliente"}
-          </button>
+  onClick={() => {
+    setMostrarFormCliente(!mostrarFormCliente);
+    setNuevoCliente({ nombre: "", dni: "", telefono: "" }); // Limpia al abrir/cerrar
+  }}
+  style={{
+    fontSize: "0.8rem",
+    backgroundColor: "#006666",
+    color: "white", // Cambié el color a blanco para que combine con tu diseño
+    border: "none",
+    cursor: "pointer",
+    padding: "5px 10px",
+    borderRadius: "4px"
+  }}
+>
+  {mostrarFormCliente ? "Cancelar" : "Cambiar / Registrar Cliente"}
+</button>
 
           {mostrarFormCliente && (
             <div
@@ -242,12 +311,16 @@ const Ventas = () => {
               }}
             >
               <input
-                placeholder="DNI"
-                onChange={(e) =>
-                  setNuevoCliente({ ...nuevoCliente, dni: e.target.value })
-                }
-                style={{ padding: "5px" }}
-              />
+  placeholder="DNI"
+  value={nuevoCliente.dni} // Añadimos el value
+  onChange={(e) => {
+    const val = e.target.value;
+    setNuevoCliente({ ...nuevoCliente, dni: val });
+    buscarCliente(val); // <--- Aquí disparamos la búsqueda automática
+  }}
+  style={{ padding: "5px" }}
+  maxLength={8} // Para DNI peruano
+/>
               <input
                 placeholder="Nombre Completo"
                 onChange={(e) =>
@@ -262,32 +335,25 @@ const Ventas = () => {
                 }
                 style={{ padding: "5px" }}
               />
+              <input
+  type="email"
+  placeholder="Correo Electrónico"
+  value={nuevoCliente.email}
+  onChange={(e) =>
+    setNuevoCliente({ ...nuevoCliente, email: e.target.value })
+  }
+  style={{ padding: "5px" }}
+/>
               <button
-                onClick={async () => {
-                  const res = await fetch(
-                    "http://localhost:4000/api/clientes/registrar",
-                    {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify(nuevoCliente),
-                    },
-                  );
-                  const data = await res.json();
-                  if (data.success) {
-                    setCliente({
-                      nombre: nuevoCliente.nombre,
-                      id_cliente: data.id_cliente,
-                      dni: nuevoCliente.dni,
-                    });
-                    setMostrarFormCliente(false);
-                  }
-                }}
+                onClick={manejarGuardarCliente} // <--- Conectamos la función aquí
                 style={{
                   backgroundColor: "#006666",
                   color: "white",
                   border: "none",
-                  padding: "8px",
+                  padding: "10px",
+                  borderRadius: "5px",
                   cursor: "pointer",
+                  fontWeight: "bold",
                 }}
               >
                 Guardar y Seleccionar

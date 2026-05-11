@@ -8,6 +8,7 @@ const app = express();
 const productRoutes = require('./routes/productRoutes'); // Ruta para obtener productos
 const loteRoutes = require('./routes/loteRoutes'); // Ruta para manejar lotes
 const ventaRoutes = require('./routes/ventaRoutes'); // Ruta para manejar ventas
+const clienteRoutes = require('./routes/clienteRoutes'); // Ruta para manejar clientes
 
 // Configuración de CORS (Permite que React se comunique)
 app.use(cors({
@@ -34,7 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/productos', productRoutes);
 app.use('/api/lotes', loteRoutes);
 app.use('/api/ventas', ventaRoutes);
-
+app.use('/api/clientes', clienteRoutes);
 // Puerto (Cambiado al 4000)
 const PORT = 4000;
 app.listen(PORT, () => {
