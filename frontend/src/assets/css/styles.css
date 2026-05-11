@@ -371,3 +371,11 @@ button:hover {
     background: #27ae60;
     transform: scale(1.1);
 }
+
+.form-input, .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Muy importante para el ancho */
+}

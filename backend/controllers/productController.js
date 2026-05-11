@@ -3,12 +3,14 @@ const db = require("../config/db");
 const getProductos = async (req, res) => {
   try {
     const query = `
-      SELECT
-        p.*,
+      SELECT 
+        p.*, 
+        c.nombre AS nombre_categoria,
         IFNULL(SUM(l.stock_lote), 0) AS stock_actual
       FROM producto p
+      INNER JOIN categoria c ON p.id_categoria = c.id_categoria
       LEFT JOIN lote l ON p.id_producto = l.id_producto
-      GROUP BY p.id_producto
+      GROUP BY p.id_producto, c.nombre
     `;
 
     const [rows] = await db.query(query);
@@ -109,9 +111,22 @@ const actualizarProducto = async (req, res) => {
   }
 };
 
+const obtenerCategorias = async (req, res) => {
+    try {
+        // Usamos el nombre exacto de tu tabla y columnas que se ven en phpMyAdmin
+        const [rows] = await db.query('SELECT id_categoria, nombre FROM categoria');
+        res.json(rows);
+    } catch (error) {
+        console.error('Error al obtener categorías:', error);
+        res.status(500).json({ message: 'Error en el servidor al traer categorías' });
+    }
+};
+
 module.exports = {
   getProductos,
   crearProducto,
   eliminarProducto,
   actualizarProducto,
+  obtenerCategorias,
+  actualizarProducto
 };

@@ -15,7 +15,6 @@ const GestionProductos = () => {
     stock_minimo: "",
     id_categoria: "1",
   });
-
   const [mostrarModalLote, setMostrarModalLote] = useState(false);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [lotesDelProducto, setLotesDelProducto] = useState([]);
@@ -26,6 +25,7 @@ const GestionProductos = () => {
     fecha_vencimiento: "",
     stock_lote: "",
   });
+  const [categorias, setCategorias] = useState([]);
 
   const cargarProductos = async () => {
     try {
@@ -58,8 +58,9 @@ const GestionProductos = () => {
   };
 
   const productosFiltrados = (productos || []).filter((p) =>
-    p.nombre?.toLowerCase().includes(busqueda.toLowerCase()),
-  );
+  p.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+  p.nombre_categoria?.toLowerCase().includes(busqueda.toLowerCase()) // Filtro por categoría
+);
 
   const prepararEdicion = (producto) => {
     setEditando(producto.id_producto);
@@ -167,6 +168,21 @@ const GestionProductos = () => {
     }
   };
 
+  const cargarCategorias = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/api/productos/categorias");
+      const data = await res.json();
+      setCategorias(data);
+    } catch (error) {
+      console.error("Error al cargar categorías:", error);
+    }
+  };
+
+  useEffect(() => {
+    cargarProductos();
+    cargarCategorias();
+  }, []);
+
   return (
     <div className="admin-page-wrapper">
       <header className="admin-header">
@@ -204,6 +220,7 @@ const GestionProductos = () => {
           <thead>
             <tr>
               <th>Nombre</th>
+              <th>Categoría</th>
               <th>Presentación</th>
               <th>Precio</th>
               <th>Stock</th>
@@ -216,6 +233,9 @@ const GestionProductos = () => {
               <tr key={p.id_producto}>
                 <td>
                   <strong>{p.nombre}</strong>
+                </td>
+                <td>
+                  <span className="category-badge">{p.nombre_categoria}</span>
                 </td>
                 <td>{p.presentacion}</td>
                 <td>S/ {p.precio_venta}</td>
@@ -263,58 +283,101 @@ const GestionProductos = () => {
           <div className="modal-content">
             <h3>{editando ? "Editar Producto" : "Nuevo Producto"}</h3>
             <form onSubmit={guardarProducto}>
-              <input
-                type="text"
-                placeholder="Nombre"
-                value={formulario.nombre}
-                onChange={(e) =>
-                  setFormulario({ ...formulario, nombre: e.target.value })
-                }
-                required
-              />
-              <textarea
-                placeholder="Descripción"
-                value={formulario.descripcion}
-                onChange={(e) =>
-                  setFormulario({ ...formulario, descripcion: e.target.value })
-                }
-                className="form-textarea"
-              />
-              <input
-                type="text"
-                placeholder="Presentación"
-                value={formulario.presentacion}
-                onChange={(e) =>
-                  setFormulario({ ...formulario, presentacion: e.target.value })
-                }
-              />
-              <div className="form-row">
+              <div className="form-group">
+                <label>Nombre del Producto</label>
                 <input
-                  type="number"
-                  step="0.01"
-                  placeholder="Precio"
-                  value={formulario.precio_venta}
+                  type="text"
+                  value={formulario.nombre}
                   onChange={(e) =>
-                    setFormulario({
-                      ...formulario,
-                      precio_venta: e.target.value,
-                    })
+                    setFormulario({ ...formulario, nombre: e.target.value })
                   }
                   required
                 />
+              </div>
+
+              <div className="form-group">
+                <label>Presentación (Ej: Blíster x10, Frasco 100ml)</label>
                 <input
-                  type="number"
-                  placeholder="Stock Mínimo"
-                  value={formulario.stock_minimo}
+                  type="text"
+                  value={formulario.presentacion}
                   onChange={(e) =>
                     setFormulario({
                       ...formulario,
-                      stock_minimo: e.target.value,
+                      presentacion: e.target.value,
                     })
                   }
                   required
                 />
               </div>
+
+              <div className="form-group">
+                <label>Descripción</label>
+                <textarea
+                  value={formulario.descripcion}
+                  onChange={(e) =>
+                    setFormulario({
+                      ...formulario,
+                      descripcion: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              {/* --- SELECTOR DE CATEGORÍA --- */}
+              <div className="form-group">
+                <label>Categoría del Medicamento</label>
+                <select
+                  className="form-input"
+                  value={formulario.id_categoria}
+                  onChange={(e) =>
+                    setFormulario({
+                      ...formulario,
+                      id_categoria: e.target.value,
+                    })
+                  }
+                  required
+                >
+                  <option value="">Seleccione una categoría...</option>
+                  {categorias.map((cat) => (
+                    <option key={cat.id_categoria} value={cat.id_categoria}>
+                      {cat.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Precio de Venta (S/)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formulario.precio_venta}
+                    onChange={(e) =>
+                      setFormulario({
+                        ...formulario,
+                        precio_venta: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Stock Mínimo</label>
+                  <input
+                    type="number"
+                    value={formulario.stock_minimo}
+                    onChange={(e) =>
+                      setFormulario({
+                        ...formulario,
+                        stock_minimo: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+              </div>
+
               <div className="modal-actions">
                 <button type="submit" className="btn-save">
                   Guardar
