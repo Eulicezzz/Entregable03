@@ -17,7 +17,7 @@ const Ventas = () => {
     nombre: "",
     dni: "",
     telefono: "",
-    email: "",
+    email: ""
   });
 
   // Funciones de lógica
@@ -91,69 +91,136 @@ const Ventas = () => {
     setCarrito(carrito.filter((item) => item.id_lote !== id_lote));
   };
 
-  const manejarGuardarCliente = async () => {
-    // Validar que al menos tenga nombre y DNI
-    if (!nuevoCliente.nombre || !nuevoCliente.dni) {
-      alert("Por favor, ingresa el nombre y DNI del cliente.");
+ const manejarGuardarCliente = async () => {
+  if (!nuevoCliente.nombre || !nuevoCliente.dni) {
+    alert("Por favor, ingresa el nombre y DNI del cliente.");
+    return;
+  }
+
+  // Creamos una copia limpia para enviar
+  const clienteData = {
+    nombre: nuevoCliente.nombre,
+    dni: nuevoCliente.dni,
+    telefono: nuevoCliente.telefono,
+    email: nuevoCliente.email
+  };
+
+  console.log("Enviando estos datos al servidor:", clienteData); // Revisa esto en la consola (F12)
+
+  try {
+    const response = await fetch("http://localhost:4000/api/clientes/registrar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(clienteData), // Enviamos la copia limpia
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      setCliente({
+        id_cliente: data.id_cliente,
+        nombre: clienteData.nombre,
+        dni: clienteData.dni,
+        email: clienteData.email,
+      });
+
+      setMostrarFormCliente(false);
+      setNuevoCliente({ nombre: "", dni: "", telefono: "", email: "" });
+      alert("Cliente registrado con éxito.");
+    } else {
+      alert("Error: " + data.message);
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+  const buscarCliente = async (dniBusqueda) => {
+    if (dniBusqueda.length >= 8) {
+      // DNI peruano tiene 8 dígitos
+      try {
+        const res = await fetch(
+          `http://localhost:4000/api/clientes/buscar/${dniBusqueda}`,
+        );
+        const data = await res.json();
+
+        if (data.success) {
+          // Si existe, lo seleccionamos automáticamente
+          setCliente(data.cliente);
+          setMostrarFormCliente(false);
+          alert(`Cliente encontrado: ${data.cliente.nombre}`);
+        } else {
+          // Si no existe, podrías limpiar el nombre para que lo registren
+          setNuevoCliente({
+            ...nuevoCliente,
+            dni: dniBusqueda,
+            nombre: "",
+            telefono: "",
+            email:data.email || "",
+          });
+          console.log("Cliente no existe, proceda a registrar.");
+        }
+      } catch (error) {
+        console.error("Error al buscar cliente:", error);
+      }
+    }
+  };
+
+  const finalizarVenta = async () => {
+    // Validaciones previas
+    if (carrito.length === 0) {
+      alert("El carrito está vacío.");
       return;
     }
 
+    const confirmacion = window.confirm(
+      "¿Estás seguro de registrar esta venta?",
+    );
+    if (!confirmacion) return;
+
+    // Estructura de datos para el Backend
+    const datosVenta = {
+      id_cliente: cliente.id_cliente,
+      id_usuario: 1, // Aquí deberías usar el ID del vendedor logueado
+      monto_total: carrito.reduce(
+        (acc, item) => acc + item.precio_venta * item.cantidad,
+        0,
+      ),
+      tipo_comprobante: "Boleta", // Puedes hacerlo dinámico con un select
+      productos: carrito.map((item) => ({
+        id_lote: item.id_lote,
+        cantidad: item.cantidad,
+        precio_venta: item.precio_venta,
+      })),
+    };
+
     try {
       const response = await fetch(
-        "http://localhost:4000/api/clientes/registrar",
+        "http://localhost:4000/api/ventas/registrar",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(nuevoCliente),
+          body: JSON.stringify(datosVenta),
         },
       );
 
       const data = await response.json();
 
       if (data.success) {
-        // 1. Actualizamos el cliente seleccionado para la venta
-        setCliente({
-          id_cliente: data.id_cliente,
-          nombre: data.nombre,
-          dni: data.dni,
-          correo: data.email
-        });
-
-        // 2. Cerramos el formulario y limpiamos los campos
-        setMostrarFormCliente(false);
-        setNuevoCliente({ nombre: "", dni: "", telefono: "", email: "" });
-
-        alert("Cliente registrado y seleccionado con éxito.");
+        alert(" Venta registrada con éxito y stock actualizado.");
+        // Limpiar todo para la siguiente venta
+        setCarrito([]);
+        setResultados([]);
+        setBusqueda("");
+        setCliente({ nombre: "Público General", id_cliente: 1, dni: "" });
       } else {
-        alert("Error: " + data.message);
+        alert("Error al registrar venta: " + data.message);
       }
     } catch (error) {
-      console.error("Error al conectar con el servidor:", error);
+      console.error("Error en la conexión:", error);
       alert("No se pudo conectar con el servidor.");
     }
   };
-
-  const buscarCliente = async (dniBusqueda) => {
-    if (dniBusqueda.length >= 8) { // DNI peruano tiene 8 dígitos
-        try {
-            const res = await fetch(`http://localhost:4000/api/clientes/buscar/${dniBusqueda}`);
-            const data = await res.json();
-            
-            if (data.success) {
-                // Si existe, lo seleccionamos automáticamente
-                setCliente(data.cliente);
-                setMostrarFormCliente(false);
-                alert(`Cliente encontrado: ${data.cliente.nombre}`);
-            } else {
-                // Si no existe, podrías limpiar el nombre para que lo registren
-                setNuevoCliente({ ...nuevoCliente, dni: dniBusqueda, nombre: '', telefono: '' });
-                console.log("Cliente no existe, proceda a registrar.");
-            }
-        } catch (error) {
-            console.error("Error al buscar cliente:", error);
-        }
-    }
-};
 
   return (
     <div className="admin-page-wrapper">
@@ -284,22 +351,22 @@ const Ventas = () => {
             {cliente.dni && `(DNI: ${cliente.dni})`}
           </p>
           <button
-  onClick={() => {
-    setMostrarFormCliente(!mostrarFormCliente);
-    setNuevoCliente({ nombre: "", dni: "", telefono: "" }); // Limpia al abrir/cerrar
-  }}
-  style={{
-    fontSize: "0.8rem",
-    backgroundColor: "#006666",
-    color: "white", // Cambié el color a blanco para que combine con tu diseño
-    border: "none",
-    cursor: "pointer",
-    padding: "5px 10px",
-    borderRadius: "4px"
-  }}
->
-  {mostrarFormCliente ? "Cancelar" : "Cambiar / Registrar Cliente"}
-</button>
+            onClick={() => {
+              setMostrarFormCliente(!mostrarFormCliente);
+              setNuevoCliente({ nombre: "", dni: "", telefono: "" }); // Limpia al abrir/cerrar
+            }}
+            style={{
+              fontSize: "0.8rem",
+              backgroundColor: "#006666",
+              color: "white", // Cambié el color a blanco para que combine con tu diseño
+              border: "none",
+              cursor: "pointer",
+              padding: "5px 10px",
+              borderRadius: "4px",
+            }}
+          >
+            {mostrarFormCliente ? "Cancelar" : "Cambiar / Registrar Cliente"}
+          </button>
 
           {mostrarFormCliente && (
             <div
@@ -311,18 +378,19 @@ const Ventas = () => {
               }}
             >
               <input
-  placeholder="DNI"
-  value={nuevoCliente.dni} // Añadimos el value
-  onChange={(e) => {
-    const val = e.target.value;
-    setNuevoCliente({ ...nuevoCliente, dni: val });
-    buscarCliente(val); // <--- Aquí disparamos la búsqueda automática
-  }}
-  style={{ padding: "5px" }}
-  maxLength={8} // Para DNI peruano
-/>
+                placeholder="DNI"
+                value={nuevoCliente.dni} // Añadimos el value
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setNuevoCliente({ ...nuevoCliente, dni: val });
+                  buscarCliente(val);
+                }}
+                style={{ padding: "5px" }}
+                maxLength={8} // Para DNI peruano
+              />
               <input
                 placeholder="Nombre Completo"
+                value={nuevoCliente.nombre}
                 onChange={(e) =>
                   setNuevoCliente({ ...nuevoCliente, nombre: e.target.value })
                 }
@@ -330,20 +398,21 @@ const Ventas = () => {
               />
               <input
                 placeholder="Teléfono"
+                value={nuevoCliente.telefono}
                 onChange={(e) =>
                   setNuevoCliente({ ...nuevoCliente, telefono: e.target.value })
                 }
                 style={{ padding: "5px" }}
               />
               <input
-  type="email"
-  placeholder="Correo Electrónico"
-  value={nuevoCliente.email}
-  onChange={(e) =>
-    setNuevoCliente({ ...nuevoCliente, email: e.target.value })
-  }
-  style={{ padding: "5px" }}
-/>
+                type="email"
+                placeholder="Correo Electrónico"
+                value={nuevoCliente.email}
+                onChange={(e) =>
+                  setNuevoCliente({ ...nuevoCliente, email: e.target.value })
+                }
+                style={{ padding: "5px" }}
+              />
               <button
                 onClick={manejarGuardarCliente} // <--- Conectamos la función aquí
                 style={{
@@ -383,7 +452,13 @@ const Ventas = () => {
           >
             🛒 Resumen
           </h3>
-
+          <p style={{ fontSize: "0.8rem", color: "#666" }}>
+            📅 Fecha: {new Date().toLocaleDateString()}{" "}
+            {new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
           <div className="carrito-list">
             {carrito.length === 0 ? (
               <p style={{ color: "#888", textAlign: "center" }}>
@@ -475,6 +550,7 @@ const Ventas = () => {
 
             <button
               disabled={carrito.length === 0}
+              onClick={finalizarVenta}
               style={{
                 width: "100%",
                 padding: "12px",
