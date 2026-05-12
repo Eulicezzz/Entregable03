@@ -26,6 +26,8 @@ const GestionProductos = () => {
     stock_lote: "",
   });
   const [categorias, setCategorias] = useState([]);
+  const user = JSON.parse(localStorage.getItem("usuario"));
+  const esAdmin = user?.nivel === "Administrador";
 
   const cargarProductos = async () => {
     try {
@@ -187,23 +189,25 @@ const GestionProductos = () => {
     <div className="admin-page-wrapper">
       <header className="admin-header">
         <h2>📦 Gestión de Inventario</h2>
-        <button
-          className="btn-add"
-          onClick={() => {
-            setEditando(null);
-            setFormulario({
-              nombre: "",
-              presentacion: "",
-              descripcion: "",
-              precio_venta: "",
-              stock_minimo: "",
-              id_categoria: "1",
-            });
-            setMostrarModal(true);
-          }}
-        >
-          + Nuevo Producto
-        </button>
+        {esAdmin && (
+    <button
+      className="btn-add"
+      onClick={() => {
+        setEditando(null);
+        setFormulario({
+          nombre: "",
+          presentacion: "",
+          descripcion: "",
+          precio_venta: "",
+          stock_minimo: "",
+          id_categoria: "1",
+        });
+        setMostrarModal(true);
+      }}
+    >
+      + Nuevo Producto
+    </button>
+  )}
       </header>
 
       <div className="admin-tools">
@@ -225,7 +229,7 @@ const GestionProductos = () => {
               <th>Precio</th>
               <th>Stock</th>
               <th>Estado</th>
-              <th>Acciones</th>
+              {esAdmin && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -251,6 +255,7 @@ const GestionProductos = () => {
                     {p.stock_actual <= p.stock_minimo ? "Stock Bajo" : "OK"}
                   </span>
                 </td>
+                {esAdmin && (
                 <td>
                   <button
                     className="btn-edit"
@@ -271,6 +276,7 @@ const GestionProductos = () => {
                     📦
                   </button>
                 </td>
+                )}
               </tr>
             ))}
           </tbody>
