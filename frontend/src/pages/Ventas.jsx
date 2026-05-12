@@ -19,6 +19,8 @@ const Ventas = () => {
     telefono: "",
     email: ""
   });
+  const usuarioData = JSON.parse(localStorage.getItem("usuario"));
+  const idUsuarioActual = usuarioData ? usuarioData.id : 1;
 
   // Funciones de lógica
   const buscarProductos = async (e) => {
@@ -168,6 +170,7 @@ const Ventas = () => {
 
   const finalizarVenta = async () => {
     // Validaciones previas
+    const idUsuarioLogueado = localStorage.getItem("id_usuario") || 1;
     if (carrito.length === 0) {
       alert("El carrito está vacío.");
       return;
@@ -181,12 +184,12 @@ const Ventas = () => {
     // Estructura de datos para el Backend
     const datosVenta = {
       id_cliente: cliente.id_cliente,
-      id_usuario: 1, // Aquí deberías usar el ID del vendedor logueado
+      id_usuario: idUsuarioLogueado, 
       monto_total: carrito.reduce(
         (acc, item) => acc + item.precio_venta * item.cantidad,
         0,
       ),
-      tipo_comprobante: "Boleta", // Puedes hacerlo dinámico con un select
+      tipo_comprobante: "Boleta", 
       productos: carrito.map((item) => ({
         id_lote: item.id_lote,
         cantidad: item.cantidad,
