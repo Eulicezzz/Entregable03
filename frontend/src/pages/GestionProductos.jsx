@@ -26,8 +26,13 @@ const GestionProductos = () => {
     stock_lote: "",
   });
   const [categorias, setCategorias] = useState([]);
-  const user = JSON.parse(localStorage.getItem("usuario"));
-  const esAdmin = user?.nivel === "Administrador";
+
+  const nombre = localStorage.getItem("nombre");
+const rol = localStorage.getItem("rol");
+const esAdmin = rol === "Administrador";
+
+console.log("Nombre:", nombre);
+console.log("¿Es Admin?:", rol === "Administrador");;
 
   const cargarProductos = async () => {
     try {
